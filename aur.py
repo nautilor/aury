@@ -6,8 +6,10 @@ import re
 import sys
 import argparse
 from subprocess import Popen, PIPE
+from colored import fg, bg, attr
 
 base_link = "https://aur.archlinux.org/packages/"
+git_link = "https://aur.archlinux.org/{}.git"
 
 def de_html(item):
     return re.sub("<[^>]*>", '', str(item))
@@ -42,10 +44,6 @@ def define_arguments():
     p.add_argument('-s', '--search',
         metavar='<package>', required=False,
         help='search for a package in aur repo')
-    
-    p.add_argument('-i', '--install',
-        metavar='<package>', required=False,
-        help='install an aur package')
     return p
 
 def is_installed(title):
@@ -55,9 +53,10 @@ def is_installed(title):
 
 def pprint(package):
     installed = "[installed]" if is_installed(package['title']) else ""
-    print('%s %s (%s) %s\n    %s' %
-        (package['link'], package['version'],
-         package['title'], installed, package['description']))
+    git = git_link.format( package['title'])
+    print('{}{} {}{} {}({}) {}{}\n    {}{}\n{}{}{}\n\n'.format( fg(4), package['link'], fg(120), package['version'],
+        fg(175), package['title'], fg(4), installed, fg(202), package['description'], fg(105), git, fg(7)))
+    print("\033[0m")
 
 
 def get_args():
@@ -72,5 +71,3 @@ if __name__ == "__main__":
 
     if args.search:
         [pprint(package) for package in search(args.search)]
-    if args.install:
-        """ __TO IMPLEMENT__ """
